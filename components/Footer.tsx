@@ -1,7 +1,12 @@
+"use client";
+
 import React from 'react';
 import Link from 'next/link';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const Footer = () => {
+  const { t } = useLanguage();
+  
   return (
     <footer className="bg-dark-lighter pt-16 pb-8">
       <div className="container mx-auto">
@@ -9,77 +14,77 @@ const Footer = () => {
           <div className="md:col-span-1">
             <div className="flex flex-col">
               <Link href="/" className="flex items-center mb-4">
-                <span className="text-2xl font-bold gradient-text">LegsAI</span>
+                <span className="text-2xl font-bold gradient-text">Legs Generator</span>
               </Link>
               <p className="text-gray-300 mb-4">
-                LegsAI是领先的AI美腿生成器平台，为您提供高质量、个性化的AI legs生成服务。
+                Legs Generator is the leading platform for creating high-quality, personalized legs with our advanced legs generator service.
               </p>
               <p className="text-accent-gold">
-                © {new Date().getFullYear()} LegsAI. 保留所有权利。
+                © {new Date().getFullYear()} Legs Generator. {t('all_rights_reserved')}
               </p>
             </div>
           </div>
           
           <div className="md:col-span-1">
-            <h5 className="text-white font-medium mb-4">快速链接</h5>
+            <h5 className="text-white font-medium mb-4">{t('quick_links')}</h5>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-gray-300 hover:text-accent-gold transition-colors">
-                  首页
+                  {t('home')}
                 </Link>
               </li>
               <li>
                 <Link href="/generate" className="text-gray-300 hover:text-accent-gold transition-colors">
-                  开始生成
+                  {t('generate')}
                 </Link>
               </li>
               <li>
                 <Link href="/#features" className="text-gray-300 hover:text-accent-gold transition-colors">
-                  功能特点
+                  {t('features')}
                 </Link>
               </li>
               <li>
                 <Link href="/#examples" className="text-gray-300 hover:text-accent-gold transition-colors">
-                  示例展示
+                  {t('examples')}
                 </Link>
               </li>
             </ul>
           </div>
           
           <div className="md:col-span-1">
-            <h5 className="text-white font-medium mb-4">资源</h5>
+            <h5 className="text-white font-medium mb-4">{t('resources')}</h5>
             <ul className="space-y-2">
               <li>
                 <Link href="/#faq" className="text-gray-300 hover:text-accent-gold transition-colors">
-                  常见问题
+                  {t('faq')}
                 </Link>
               </li>
               <li>
                 <Link href="/blog" className="text-gray-300 hover:text-accent-gold transition-colors">
-                  博客文章
+                  {t('blog_posts')}
                 </Link>
               </li>
               <li>
                 <Link href="/tutorials" className="text-gray-300 hover:text-accent-gold transition-colors">
-                  使用教程
+                  {t('tutorials')}
                 </Link>
               </li>
               <li>
                 <Link href="/updates" className="text-gray-300 hover:text-accent-gold transition-colors">
-                  更新日志
+                  {t('updates')}
                 </Link>
               </li>
             </ul>
           </div>
           
           <div className="md:col-span-1">
-            <h5 className="text-white font-medium mb-4">联系我们</h5>
+            <h5 className="text-white font-medium mb-4">{t('contact_us')}</h5>
             <ul className="space-y-2">
               <li className="text-gray-300">
-                邮箱: info@legsgenerator.com
+                Email: info@legsgenerator.com
               </li>
               <li className="text-gray-300">
-                关注我们:
+                Follow Us:
               </li>
               <li className="flex space-x-4 mt-2">
                 <a href="#" className="text-accent-gold hover:text-white transition-colors">
@@ -98,13 +103,13 @@ const Footer = () => {
         
         <div className="border-t border-gray-700 mt-12 pt-8 text-sm text-gray-400">
           <div className="flex flex-col md:flex-row justify-between">
-            <p>LegsAI - 专业的AI美腿生成器 | AI Legs Generator</p>
+            <p>Legs Generator - Professional Legs Creator | legs generator</p>
             <div className="flex mt-4 md:mt-0 space-x-6">
               <Link href="/privacy" className="hover:text-accent-gold transition-colors">
-                隐私政策
+                {t('privacy_policy')}
               </Link>
               <Link href="/terms" className="hover:text-accent-gold transition-colors">
-                服务条款
+                {t('terms_of_service')}
               </Link>
             </div>
           </div>

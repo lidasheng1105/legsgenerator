@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const ImageResult = () => {
+  const { t } = useLanguage();
   const [images, setImages] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   
@@ -45,14 +47,14 @@ const ImageResult = () => {
   
   return (
     <div className="card h-full flex flex-col">
-      <h3 className="mb-6">生成结果</h3>
+      <h3 className="mb-6">{t('generation_results') || 'Generation Results'}</h3>
       
       {images.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
           <div className="text-accent-gold text-6xl mb-4">✨</div>
-          <h4 className="mb-3">您的AI美腿图像将在这里显示</h4>
+          <h4 className="mb-3">{t('your_images_will_appear') || 'Your leg images will appear here'}</h4>
           <p className="text-gray-400">
-            使用左侧的表单开始生成。我们的AI legs generator将根据您的描述创建逼真的美腿图像。
+            {t('use_form_to_start') || 'Use the form on the left to start generating. Our advanced legs generator will create realistic leg images based on your description.'}
           </p>
         </div>
       ) : (
@@ -60,11 +62,11 @@ const ImageResult = () => {
           <div className="flex-1 bg-dark rounded-lg overflow-hidden relative mb-4">
             {selectedImage ? (
               <div className="w-full h-full min-h-[400px] flex items-center justify-center">
-                <span className="text-accent-gold">此处将显示生成的美腿图像</span>
+                <span className="text-accent-gold">{t('generated_leg_image') || 'Generated Leg Image'}</span>
               </div>
             ) : (
               <div className="w-full h-[400px] flex items-center justify-center">
-                <span className="text-gray-400">暂无选中图像</span>
+                <span className="text-gray-400">{t('no_image_selected') || 'No image selected'}</span>
               </div>
             )}
           </div>
@@ -94,13 +96,13 @@ const ImageResult = () => {
                 disabled={!selectedImage}
                 className="btn btn-primary"
               >
-                下载图像
+                {t('download_image') || 'Download Image'}
               </button>
             </div>
             
             <div>
               <button className="btn btn-outline">
-                重新生成
+                {t('regenerate') || 'Regenerate'}
               </button>
             </div>
           </div>

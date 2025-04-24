@@ -2,16 +2,18 @@
 
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import { useLanguage } from '@/lib/LanguageContext';
 
 const styles = [
-  { id: 'elegant', name: '优雅', description: '高雅精致的美腿风格' },
-  { id: 'sexy', name: '性感', description: '妩媚诱人的美腿风格' },
-  { id: 'fashion', name: '时尚', description: '潮流前卫的美腿风格' },
-  { id: 'casual', name: '休闲', description: '舒适日常的美腿风格' },
-  { id: 'sports', name: '运动', description: '充满活力的运动美腿' },
+  { id: 'elegant', name: { en: 'Elegant', zh: '优雅' }, description: { en: 'Refined and graceful leg style', zh: '高雅精致的美腿风格' } },
+  { id: 'sexy', name: { en: 'Sexy', zh: '性感' }, description: { en: 'Alluring and sensual leg style', zh: '妩媚诱人的美腿风格' } },
+  { id: 'fashion', name: { en: 'Fashion', zh: '时尚' }, description: { en: 'Trendy and modern leg style', zh: '潮流前卫的美腿风格' } },
+  { id: 'casual', name: { en: 'Casual', zh: '休闲' }, description: { en: 'Relaxed everyday leg style', zh: '舒适日常的美腿风格' } },
+  { id: 'sports', name: { en: 'Athletic', zh: '运动' }, description: { en: 'Energetic athletic leg style', zh: '充满活力的运动美腿' } },
 ];
 
 const GenerationForm = () => {
+  const { language, t } = useLanguage();
   const [prompt, setPrompt] = useState('');
   const [selectedStyle, setSelectedStyle] = useState('elegant');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -20,7 +22,7 @@ const GenerationForm = () => {
     e.preventDefault();
     
     if (!prompt.trim()) {
-      toast.error('请输入描述文本');
+      toast.error(language === 'en' ? 'Please enter a description' : '请输入描述文本');
       return;
     }
     
@@ -29,7 +31,7 @@ const GenerationForm = () => {
     // 模拟API调用
     setTimeout(() => {
       setIsGenerating(false);
-      toast.success('美腿图像生成成功！');
+      toast.success(language === 'en' ? 'Leg image generated successfully!' : '美腿图像生成成功！');
       // 实际项目中这里应该调用真实的API
       // generateImage(prompt, selectedStyle);
     }, 2000);
@@ -37,29 +39,31 @@ const GenerationForm = () => {
   
   return (
     <div className="card">
-      <h3 className="mb-6">创建您的AI美腿图像</h3>
+      <h3 className="mb-6">{t('create_your_legs') || 'Create Your Leg Images'}</h3>
       
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
           <label htmlFor="prompt" className="block text-white mb-2">
-            描述您想要的美腿图像 <span className="text-accent-gold">*</span>
+            {t('describe_legs') || 'Describe the legs you want'} <span className="text-accent-gold">*</span>
           </label>
           <textarea
             id="prompt"
             className="w-full bg-dark border border-gray-700 rounded-lg p-3 text-white focus:outline-none focus:border-accent-gold transition-colors"
             rows={5}
-            placeholder="例如：穿着黑色高跟鞋的修长美腿，站在大理石地面上，柔和的光线..."
+            placeholder={language === 'en' 
+              ? 'E.g.: Slender legs with black high heels, standing on marble floor, soft lighting...'
+              : '例如：穿着黑色高跟鞋的修长美腿，站在大理石地面上，柔和的光线...'}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
           ></textarea>
           <p className="text-gray-400 text-sm mt-2">
-            详细的描述将帮助AI legs generator创建更符合您期望的图像
+            {t('detailed_description_helps') || 'Detailed descriptions help our legs generator create images that better match your expectations'}
           </p>
         </div>
         
         <div className="mb-6">
           <label className="block text-white mb-2">
-            选择风格 <span className="text-accent-gold">*</span>
+            {t('select_style') || 'Select Style'} <span className="text-accent-gold">*</span>
           </label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {styles.map((style) => (
@@ -72,30 +76,30 @@ const GenerationForm = () => {
                 }`}
                 onClick={() => setSelectedStyle(style.id)}
               >
-                <div className="font-medium">{style.name}</div>
-                <div className="text-gray-400 text-sm">{style.description}</div>
+                <div className="font-medium">{style.name[language]}</div>
+                <div className="text-gray-400 text-sm">{style.description[language]}</div>
               </div>
             ))}
           </div>
         </div>
         
         <div className="mb-6">
-          <label className="block text-white mb-4">高级选项</label>
+          <label className="block text-white mb-4">{t('advanced_options') || 'Advanced Options'}</label>
           <div className="grid grid-cols-1 gap-4">
             <div className="flex items-center justify-between">
-              <span>图像质量</span>
+              <span>{t('image_quality') || 'Image Quality'}</span>
               <select className="bg-dark border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-accent-gold transition-colors">
-                <option value="standard">标准</option>
-                <option value="high">高质量</option>
-                <option value="ultra">超高质量</option>
+                <option value="standard">{t('standard') || 'Standard'}</option>
+                <option value="high">{t('high_quality') || 'High Quality'}</option>
+                <option value="ultra">{t('ultra_high_quality') || 'Ultra High Quality'}</option>
               </select>
             </div>
             <div className="flex items-center justify-between">
-              <span>生成数量</span>
+              <span>{t('generation_count') || 'Number of Images'}</span>
               <select className="bg-dark border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-accent-gold transition-colors">
-                <option value="1">1张</option>
-                <option value="2">2张</option>
-                <option value="4">4张</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="4">4</option>
               </select>
             </div>
           </div>
@@ -116,10 +120,10 @@ const GenerationForm = () => {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              生成中...
+              {t('generating') || 'Generating...'}
             </span>
           ) : (
-            '开始生成美腿图像'
+            t('start_generating') || 'Start Generating Leg Images'
           )}
         </button>
       </form>
