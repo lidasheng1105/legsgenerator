@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useLanguage } from '@/lib/LanguageContext';
 
@@ -17,8 +17,48 @@ const GenerationForm = () => {
   const [prompt, setPrompt] = useState('');
   const [selectedStyle, setSelectedStyle] = useState('elegant');
   const [isGenerating, setIsGenerating] = useState(false);
+  const [imageQuality, setImageQuality] = useState('standard');
+  const [imageCount, setImageCount] = useState('1');
+  const [generatedImages, setGeneratedImages] = useState<string[]>([]);
+  const [error, setError] = useState('');
   
-  const handleSubmit = (e: React.FormEvent) => {
+  // 监听重新生成事件
+  useEffect(() => {
+    const handleRegenerate = () => {
+      if (prompt.trim()) {
+        handleSubmit(new Event('submit') as any);
+      }
+    };
+    
+    window.addEventListener('regenerateImage', handleRegenerate);
+    
+    return () => {
+      window.removeEventListener('regenerateImage', handleRegenerate);
+    };
+  }, [prompt]);
+  
+  // 创建带有样式的最终提示词
+  const createFinalPrompt = (basePrompt: string, style: string) => {
+    const styleTexts: Record<string, string> = {
+      elegant: language === 'en' ? 'elegant, refined, graceful legs' : '优雅精致的美腿',
+      sexy: language === 'en' ? 'sexy, alluring, sensual legs' : '性感妩媚的美腿',
+      fashion: language === 'en' ? 'trendy, fashion, modern legs' : '时尚潮流的美腿',
+      casual: language === 'en' ? 'casual, relaxed, everyday legs' : '休闲舒适的美腿',
+      sports: language === 'en' ? 'athletic, energetic, sporty legs' : '运动健美的美腿',
+    };
+    
+    // 针对SiliconFlow模型优化的提示词格式
+    return `${styleTexts[style] || ''}, ${basePrompt}, high-resolution, high-quality, 8k, photorealistic`;
+  };
+  
+  // 映射质量选项到API参数
+  const qualitySettings: Record<string, { width: number, height: number }> = {
+    standard: { width: 512, height: 768 },
+    high: { width: 768, height: 1024 },
+    ultra: { width: 1024, height: 1536 },
+  };
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!prompt.trim()) {
@@ -27,19 +67,59 @@ const GenerationForm = () => {
     }
     
     setIsGenerating(true);
+    setError('');
     
-    // 模拟API调用
-    setTimeout(() => {
+    try {
+      const finalPrompt = createFinalPrompt(prompt, selectedStyle);
+      const { width, height } = qualitySettings[imageQuality] || qualitySettings.standard;
+      
+      // 调用我们的API端点
+      const response = await fetch('/api/generate-image', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          prompt: finalPrompt,
+          negativePrompt: "deformed, ugly, disfigured, poor proportions, bad anatomy, low resolution, blurry",
+          width,
+          height,
+          numOutputs: parseInt(imageCount, 10),
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || '图像生成失败');
+      }
+      
+      // 更新生成的图像状态
+      setGeneratedImages(data.images);
+      
+      // 使用自定义事件通知ImageResult组件
+      const event = new CustomEvent('imagesGenerated', { detail: { images: data.images } });
+      window.dispatchEvent(event);
+      
+      toast.success(language === 'en' ? 'Leg images generated successfully!' : '美腿图像生成成功！');
+    } catch (err: any) {
+      console.error('图像生成错误:', err);
+      setError(err.message || '生成过程中出错');
+      toast.error(language === 'en' ? 'Failed to generate images' : '图像生成失败');
+    } finally {
       setIsGenerating(false);
-      toast.success(language === 'en' ? 'Leg image generated successfully!' : '美腿图像生成成功！');
-      // 实际项目中这里应该调用真实的API
-      // generateImage(prompt, selectedStyle);
-    }, 2000);
+    }
   };
   
   return (
     <div className="card">
       <h3 className="mb-6">{t('create_your_legs') || 'Create Your Leg Images'}</h3>
+      
+      {error && (
+        <div className="mb-4 p-3 bg-red-900/50 border border-red-500 rounded-lg text-white">
+          <p className="text-sm">{error}</p>
+        </div>
+      )}
       
       <form onSubmit={handleSubmit}>
         <div className="mb-6">
@@ -88,7 +168,11 @@ const GenerationForm = () => {
           <div className="grid grid-cols-1 gap-4">
             <div className="flex items-center justify-between">
               <span>{t('image_quality') || 'Image Quality'}</span>
-              <select className="bg-dark border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-accent-gold transition-colors">
+              <select 
+                className="bg-dark border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                value={imageQuality}
+                onChange={(e) => setImageQuality(e.target.value)}
+              >
                 <option value="standard">{t('standard') || 'Standard'}</option>
                 <option value="high">{t('high_quality') || 'High Quality'}</option>
                 <option value="ultra">{t('ultra_high_quality') || 'Ultra High Quality'}</option>
@@ -96,7 +180,11 @@ const GenerationForm = () => {
             </div>
             <div className="flex items-center justify-between">
               <span>{t('generation_count') || 'Number of Images'}</span>
-              <select className="bg-dark border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-accent-gold transition-colors">
+              <select 
+                className="bg-dark border border-gray-700 rounded-lg p-2 text-white focus:outline-none focus:border-accent-gold transition-colors"
+                value={imageCount}
+                onChange={(e) => setImageCount(e.target.value)}
+              >
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="4">4</option>
